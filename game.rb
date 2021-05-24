@@ -1,6 +1,5 @@
 require_relative "player"
 require_relative "question"
-require_relative "turn"
 
 class Game 
   attr_accessor :status
@@ -10,7 +9,6 @@ class Game
     @player1 = Player.new("Player 1")
     @player2 = Player.new("Player 2")
 
-    @turn1 = Turn.new
 
     @question1 = Question.new
   end
@@ -22,18 +20,17 @@ class Game
   end
 
   def start
+    current_player = @player1
+    other_player = @player2
+
     while self.status != "End" do
-      if @turn1.current_turn == 1
-        current_player = @player1
-      elsif @turn1.current_turn == 2
-        current_player = @player2
-      end
+      question = Question.new
+      puts "#{current_player.name}: #{question.question}"
+      answer = gets.chomp.to_i
       
-      @question1.ask(current_player.name)
-      
-      if @question1.compare
+      if question.check_answer(answer)
         puts "#{current_player.name}: Yes! You are correct."
-      elsif !@question1.compare
+      else
         puts "#{current_player.name}: Seriously! No!"
         current_player.lives -= 1
       end
@@ -41,20 +38,13 @@ class Game
       puts "#{@player1.name}: #{@player1.lives}/3 vs #{@player2.name}: #{@player2.lives}/3"
       
       puts "----- NEW TURN -----"
-      # @turn1.change_turns
-      
-      if @player1.lives == 0
+      current_player, other_player = other_player, current_player
+
+      if current_player.lives == 0
         puts "... some time later ..." 
-        puts "#{@player2.name} wins with a score of #{@player2.lives}"
-        self.end
-      elsif @player2.lives == 0
-        puts "... some time later ..." 
-        puts "#{@player1.name} wins with a score of #{@player1.lives}"
+        puts "#{other_player.name} wins with a score of #{other_player.name}"
         self.end
       end
     end
   end
-
-
-
 end
